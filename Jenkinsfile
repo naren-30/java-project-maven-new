@@ -6,11 +6,11 @@ steps{
   git 'https://github.com/naren-30/java-project-maven-new.git'
 }
 }
-stage(clean package){
-steps{
-sh 'mvn clean package'
-}
-}
+    stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
 stage(docker build image){
 steps{
 docker build -t hotstar .
