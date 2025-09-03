@@ -38,18 +38,18 @@ pipeline {
                 }
             }
         }
-
         stage('Docker Swarm Deploy') {
-            steps {
-                sh '''
-                docker service rm hotserv || true
-                docker service create \
-                  --name hotserv \
-                  -p 8008:8080 \
-                  --replicas 3 \
-                  $DOCKER_HUB_USER/$IMAGE_NAME:$IMAGE_TAG
-                '''
-            }
-        }
+    steps {
+        sh '''
+        docker swarm init || true
+        docker service rm hotserv || true
+        docker service create \
+          --name hotserv \
+          -p 8008:8080 \
+          --replicas 3 \
+          $DOCKER_HUB_USER/$IMAGE_NAME:$IMAGE_TAG
+        '''
+    }
+}
     }
 }
