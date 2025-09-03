@@ -13,12 +13,12 @@ steps{
         }
 stage(docker build image){
 steps{
-docker build -t hotstar .
+sh 'docker build -t hotstar .'
 }
 }
 stage(docker run){
 steps{
-docker run -itd --name hotstar -p 8001:8080 hotstar
+sh 'docker run -itd --name hotstar -p 8001:8080 hotstar'
 }
 }
 }
