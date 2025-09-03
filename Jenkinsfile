@@ -44,9 +44,9 @@ pipeline {
         docker swarm init || true
         docker service rm hotserv || true
         docker service create \
-          --name hotserv \
-          -p 8008:8080 \
-          --replicas 3 \
+       --name hotserv \
+       --publish published=8008,target=8080 \
+       --replicas 3 \
           $DOCKER_HUB_USER/$IMAGE_NAME:$IMAGE_TAG
         '''
     }
