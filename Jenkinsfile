@@ -13,7 +13,7 @@ sh 'mvn clean package'
 }
 stage(docker build image){
 steps{
-docker build -t hotstare .
+docker build -t hotstar .
 }
 }
 stage(docker run){
