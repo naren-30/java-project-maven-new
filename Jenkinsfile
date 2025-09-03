@@ -1,7 +1,7 @@
 pipeline{
 agent any 
 stages{
-stage(checkout){
+stage(checkout) {
 steps{
   git 'https://github.com/naren-30/java-project-maven-new.git'
 }
@@ -11,14 +11,14 @@ steps{
                 sh 'mvn clean package'
             }
         }
-stage(docker build image){
+stage(docker build image) {
 steps{
 sh 'docker build -t hotstar .'
 }
 }
-stage(docker run){
+stage(docker run) {
 steps{
-sh 'docker run -itd --name hotstar -p 8001:8080 hotstar'
+sh 'docker run -itd --name hotcont -p 8001:8080 hotstar'
 }
 }
 }
