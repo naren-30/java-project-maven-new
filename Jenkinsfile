@@ -1,10 +1,9 @@
-
 pipeline {
     agent any
 
     environment {
-       DOCKER_HUB_USER = 'naren3005'
-        IMAGE_NAME ='hotstar'
+        DOCKER_HUB_USER = 'naren3005'     // your Docker Hub username
+        IMAGE_NAME = 'hotstar'            // your Docker Hub repository
         IMAGE_TAG = 'v1'
     }
 
@@ -15,7 +14,7 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build with Maven') {
             steps {
                 sh 'mvn clean package'
             }
@@ -23,33 +22,34 @@ pipeline {
 
         stage('Docker Build Image') {
             steps {
-                sh 'docker build -t hotstar .'
+                sh 'docker build -t $DOCKER_HUB_USER/$IMAGE_NAME:$IMAGE_TAG .'
             }
         }
 
-        stage('Docker Run') {
+        stage('Push to Docker Hub') {
             steps {
-                sh '''
-                docker rm -f hotcont || true
-                docker run -d --name hotcont -p 8001:8080 hotstar
-                '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker',       // Jenkins credentials ID you created
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh 'docker push $DOCKER_HUB_USER/$IMAGE_NAME:$IMAGE_TAG'
+                }
             }
         }
-        stage (docker swarm) {
-            steps{
+
+        stage('Docker Swarm Deploy') {
+            steps {
+                sh '''
+                docker service rm hotserv || true
+                docker service create \
+                  --name hotserv \
+                  -p 8008:8080 \
+                  --replicas 3 \
+                  $DOCKER_HUB_USER/$IMAGE_NAME:$IMAGE_TAG
                 '''
-                docker sevice create --name hotserv -p 8008:8080 --replicas 9 hotstar
-                '''
-            }   
-        }
-        stage('push to dockerhub') {
-          steps{
-              withCredentials([usernamePassword(
-                  credentialsId: 'docker', //jenkins credentials ID
-                  usernameVareable: 'DOCKER_USER',
-                  passwordVariables: 'DOCKER_PASS'
-              )])
-          }
+            }
         }
     }
 }
